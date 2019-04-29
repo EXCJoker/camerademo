@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.example.camerademo.camera.CameraActivity;
+import com.example.camerademo.camera2.CameraActivity;
 
 /**
  * 创建日期：2019/4/24 on 3:36 PM.

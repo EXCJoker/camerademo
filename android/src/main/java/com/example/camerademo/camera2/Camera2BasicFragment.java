@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.camerademo.camera;
+package com.example.camerademo.camera2;
 
 import android.Manifest;
 import android.app.Activity;
