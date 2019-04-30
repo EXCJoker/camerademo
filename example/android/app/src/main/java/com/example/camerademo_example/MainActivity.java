@@ -14,13 +14,14 @@ import io.flutter.plugins.GeneratedPluginRegistrant;
 
 public class MainActivity extends FlutterActivity {
   public static final String CHANNELTOFLUTTER = "com.example/lib";
+  private BroadcastReceiver chargingStateChangeReceiver;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     GeneratedPluginRegistrant.registerWith(this);
     new EventChannel(getFlutterView(),CHANNELTOFLUTTER).setStreamHandler(new EventChannel.StreamHandler() {
       // 接收电池广播的BroadcastReceiver。
-      private BroadcastReceiver chargingStateChangeReceiver;
+
       // 这个onListen是Flutter端开始监听这个channel时的回调，第二个参数 EventSink是用来传数据的载体。
       @Override
       public void onListen(Object o, EventChannel.EventSink eventSink) {
@@ -38,6 +39,15 @@ public class MainActivity extends FlutterActivity {
       }
     });
   }
+
+  @Override
+  protected void onDestroy() {
+    unregisterReceiver(chargingStateChangeReceiver);
+    chargingStateChangeReceiver = null;
+    super.onDestroy();
+
+  }
+
   private BroadcastReceiver createChargingStateChangeReceiver(final EventChannel.EventSink events) {
     return new BroadcastReceiver() {
       @Override

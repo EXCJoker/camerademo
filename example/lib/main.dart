@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:camerademo/camerademo.dart';
 import 'package:camerademo/even_channel_demo.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
@@ -23,13 +24,14 @@ class _MyAppState extends State<MyApp> {
   }
 
   void initEvent() {
-    EventChannelDemo.initEvent(_onEvent,_onError);
+    EventChannelDemo.initEvent(_onEvent, _onError);
   }
+
   void _onEvent(Object event) {
     print("flutter _onEvent");
     setState(() {
       _chargingStatus =
-      "Battery status: ${event == 'charging' ? '' : 'dis'}charging.";
+          "Battery status: ${event == 'charging' ? '' : 'dis'}  charging...";
     });
   }
 
@@ -38,6 +40,7 @@ class _MyAppState extends State<MyApp> {
       _chargingStatus = 'Battery status: unknown.';
     });
   }
+
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     String platformVersion;
@@ -58,16 +61,16 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-
-  Future<String> jumpToNative() async{
+  Future<String> jumpToNative() async {
     String result;
-    return result =  await Camerademo.jumpResult;
+    return result = await Camerademo.jumpResult;
   }
 
-  jumpToNativeWithParams() async{
+  jumpToNativeWithParams() async {
     await Camerademo.jumpWithParams;
   }
-  stop(){
+
+  stop() {
     EventChannelDemo.stop(_onEvent, _onError);
   }
 
@@ -83,11 +86,19 @@ class _MyAppState extends State<MyApp> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text('Running on: $_platformVersion\n'),
+              const SizedBox(height: 16.0),
+              Text(
+                'Flutter to Android',
+                style: new TextStyle(
+                    color: Colors.blue,
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w700),
+              ),
               RaisedButton(
                 onPressed: () {
                   jumpToNative();
                 },
-                child: Text("跳转native"),
+                child: Text("跳转native - camera"),
               ),
               const SizedBox(height: 8.0),
               RaisedButton(
@@ -95,6 +106,14 @@ class _MyAppState extends State<MyApp> {
                     jumpToNativeWithParams();
                   },
                   child: Text("跳转native - 带参数")),
+              const SizedBox(height: 16.0),
+              Text(
+                'Android to Flutter',
+                style: new TextStyle(
+                    color: Colors.blue,
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w700),
+              ),
               const SizedBox(height: 8.0),
               Text(_chargingStatus),
               const SizedBox(height: 8.0),
@@ -103,7 +122,7 @@ class _MyAppState extends State<MyApp> {
                   print("flutter _onEvent");
                   stop();
                 },
-                child: Text("stop receive from native"),
+                child: Text("stop receive from na"),
               ),
             ],
           ),

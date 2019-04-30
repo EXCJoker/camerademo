@@ -36,8 +36,8 @@
             android:name="com.example.camerademo.SecondActivity"
             android:theme="@style/LaunchTheme"/>
 
-        <activity android:name="com.example.camerademo.camera2.CameraActivity"
-                  android:theme="@style/MaterialTheme"
+        <activity android:name="com.example.camerademo.camera.CameraActivity"
+                  android:theme="@style/Theme.Demo"
             />
     </application>
 </manifest>

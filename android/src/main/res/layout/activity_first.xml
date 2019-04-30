@@ -20,8 +20,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        style="@style/Base.TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
         android:text="打开摄像头-人脸识别"
-        android:background="@android:color/white"
+        android:background="#0000ff"
+        android:textSize="24dp"
         android:textColor="@android:color/holo_blue_bright"
         android:onClick="openCamera"
         />
