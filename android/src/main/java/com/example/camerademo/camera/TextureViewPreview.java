@@ -45,9 +45,7 @@ class TextureViewPreview extends PreviewImpl {
         return mFaceView;
     }
     TextureViewPreview(Context context, ViewGroup parent) {
-
-
-        if (Build.VERSION.SDK_INT >=21) {
+        if (Build.VERSION.SDK_INT >21) {
             final View view = View.inflate(context, R.layout.texture_view2, parent);
             mTextureView = (TextureView) view.findViewById(R.id.texture_view);
             mFaceView = (FaceView) view.findViewById(R.id.faceView);
