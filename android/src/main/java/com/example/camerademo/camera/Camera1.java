@@ -24,6 +24,7 @@ import android.hardware.Camera;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.util.SparseArrayCompat;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 import java.io.IOException;
@@ -122,9 +123,12 @@ class Camera1 extends CameraViewImpl {
         Matrix matrix = new Matrix();
         // Need mirror for front camera.
         boolean mirror = (mFacing == Camera.CameraInfo.CAMERA_FACING_FRONT);
+        // 缩放, (1, 1) 无改变, (-1, 1) x轴反向缩放, 即表示沿y轴镜像翻转
+        // 如果是前置摄像头需翻转, 后置不需要.
         matrix.setScale(mirror?-1f:1f, 1f);
         // This is the value for android.hardware.Camera.setDisplayOrientation.
         //        matrix.postRotate((float) mDisplayOrientation);
+        // 旋转, 从上面的坐标图可以看出, 预览和底层坐标有夹角
         if(mirror){
             matrix.postRotate(calcDisplayOrientation(mDisplayOrientation));
         }else{
@@ -137,6 +141,7 @@ class Camera1 extends CameraViewImpl {
 
         ArrayList<RectF> rectList = new ArrayList<RectF>();
         for (Camera.Face e : faces) {
+            Log.d(TAG,"camera1111111----->e.scroe = " + e.score);
             RectF srcRect = new RectF(e.rect);
             RectF dstRect = new RectF(0f, 0f, 0f, 0f);
             matrix.mapRect(dstRect, srcRect);
