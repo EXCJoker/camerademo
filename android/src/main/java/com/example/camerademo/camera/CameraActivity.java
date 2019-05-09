@@ -20,7 +20,6 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -257,12 +256,12 @@ public class CameraActivity extends AppCompatActivity implements
             Log.d(TAG, "onPictureTaken " + data.length);
             Toast.makeText(cameraView.getContext(), R.string.picture_taken, Toast.LENGTH_SHORT)
                     .show();
-            im.setImageBitmap(BitmapFactory.decodeByteArray(data, 0, data.length));
+//            im.setImageBitmap(BitmapFactory.decodeByteArray(data, 0, data.length));
             getBackgroundHandler().post(new Runnable() {
                 @Override
                 public void run() {
                     File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                            "picture.jpg");
+                            "picture.png");
                     OutputStream os = null;
                     try {
                         os = new FileOutputStream(file);
