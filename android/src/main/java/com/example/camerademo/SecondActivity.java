@@ -6,7 +6,6 @@ import android.widget.TextView;
 
 /**
  * 创建日期：2019/4/24 on 3:37 PM.
- * 作者：liuxun
  * 描述：
  */
 

@@ -1,7 +1,7 @@
 name: camerademo
 description: A new flutter plugin project.
-version: 0.0.1
-author: liuxun <liuxun2@kinsoft.com>
+version: 0.0.2
+author: one <one@kinsoft.com>
 homepage: https://www.baidu.com
 
 environment:

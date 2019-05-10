@@ -9,7 +9,6 @@ import com.example.camerademo.camera.CameraActivity;
 
 /**
  * 创建日期：2019/4/24 on 3:36 PM.
- * 作者：liuxun
  * 描述：
  */
 

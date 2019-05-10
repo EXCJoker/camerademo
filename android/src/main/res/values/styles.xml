@@ -35,4 +35,10 @@
         <item name="autoFocus">true</item>
         <item name="flash">auto</item>
     </style>
+
+    <style name="LaunchTheme" parent="@android:style/Theme.Black.NoTitleBar">
+        <!-- Show a splash screen on the activity. Automatically removed when
+             Flutter draws its first frame -->
+        <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
 </resources>
