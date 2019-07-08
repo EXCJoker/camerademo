@@ -19,9 +19,7 @@ package com.example.camerademo.camera;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Matrix;
-import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
-import android.os.Build;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -41,25 +39,14 @@ class TextureViewPreview extends PreviewImpl {
     private SurfaceHolder surfaceHolder;
 
     @Override
-    FaceView getFaceView(){
+    FaceView getFaceView() {
         return mFaceView;
     }
+
     TextureViewPreview(Context context, ViewGroup parent) {
-        if (Build.VERSION.SDK_INT >21) {
-            final View view = View.inflate(context, R.layout.texture_view2, parent);
-            mTextureView = (TextureView) view.findViewById(R.id.texture_view);
-            mFaceView = (FaceView) view.findViewById(R.id.faceView);
-            // 设置画人脸框的surface
-            surfaceview = (SurfaceView)view.findViewById(R.id.surfaceview_show_rectangle);
-            surfaceview.setZOrderOnTop(true);  //处于顶层
-            surfaceview.getHolder().setFormat(PixelFormat.TRANSPARENT);  //设置surface为透明
-            surfaceHolder = surfaceview.getHolder(); //设置一下SurfaceView并获取到surfaceHolder便于后面画框
-        }else{
-            final View view = View.inflate(context, R.layout.texture_view, parent);
-            mTextureView = (TextureView) view.findViewById(R.id.texture_view);
-            mFaceView = (FaceView) view.findViewById(R.id.faceView);
-            // 设置画人脸框的surface
-        }
+        final View view = View.inflate(context, R.layout.texture_view, parent);
+        mTextureView = (TextureView) view.findViewById(R.id.texture_view);
+        mFaceView = (FaceView) view.findViewById(R.id.faceView);
 
         mTextureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
 

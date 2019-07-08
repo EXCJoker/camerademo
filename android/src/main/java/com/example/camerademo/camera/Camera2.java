@@ -18,12 +18,8 @@ package com.example.camerademo.camera;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.hardware.Camera;
@@ -43,7 +39,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Surface;
-import android.view.SurfaceHolder;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -164,169 +159,62 @@ class Camera2 extends CameraViewImpl {
 
         @Override
         public void onPreview(CaptureResult result) {
-            faceInPreview(result);
+            FaceView faceView =(FaceView) mPreview.getFaceView();
+            faceView.setFaces(transForm2(result.get(result.STATISTICS_FACES)));
         }
     };
 
-
-    private int FrameCount = 0;
-
-    private void faceInPreview(CaptureResult result) {
-        // We have nothing to do when the camera preview is working normally.
-        // ************************** 重点部分 *************************************
-        FrameCount = FrameCount + 1;  // FrameCount定义在方法外面 初始值为0
-        // We have nothing to do when the camera preview is working normally.
-        //获得Face类 face[]中就是我们得到的人脸
-        Face face[] = result.get(result.STATISTICS_FACES);
-//        FaceView view = (FaceView) mPreview.getFaceView();
-//        view.setFaces(transForm2(face));
-        // 打印出当前帧编号
-        FrameCount = FrameCount + 1;
-        if (face.length>0) {
-            drawRectangel2(result);
-            //获取人脸矩形框
-//            Rect bounds = face[0].getBounds();
-//            // 成像画面与相机画面存在着比例缩放和角度变化需要在drawRectangle中再进行调整
-//            // face_rec(left, top, right, bottom)中是预览画面中人脸框的位置，当你想把你的结果展示在预览画面上的时候，可能要用到这个框。
-//            drawRectangle(bounds.left, bounds.top, bounds.right, bounds.bottom);
-        }
-    }
-
-    private void drawRectangel2(CaptureResult result) {
-        Face faces[]=result.get(CaptureResult.STATISTICS_FACES);
-        Log.d(TAG,"人脸个数:["+faces.length+"]");
-
-        Canvas canvas =  getHolder().lockCanvas();
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//旧画面清理覆盖
-
-        if(faces.length>0){
-            for(int i=0;i<faces.length;i++){
-                Rect fRect = faces[i].getBounds();
-                Log.d(TAG,"[R"+i+"]:[left:"+fRect.left+",top:"+fRect.top+",right:"+fRect.right+",bottom:"+fRect.bottom+"]");
-                Log.d(TAG,"camera222222----->faces[i].getScore()" + faces[i].getScore());
-                //人脸检测坐标基于相机成像画面尺寸以及坐标原点。此处进行比例换算
-                //成像画面与方框绘制画布长宽比比例（同画面角度情况下的长宽比例（此处前后摄像头成像画面相对预览画面倒置（±90°），计算比例时长宽互换））
-                float scaleWidth = canvas.getHeight()*1.0f/cPixelSize.getWidth();
-                float scaleHeight = canvas.getWidth()*1.0f/cPixelSize.getHeight();
-
-                //坐标缩放
-                int l = (int) (fRect.left*scaleWidth);
-                int t = (int) (fRect.top*scaleHeight);
-                int r = (int) (fRect.right*scaleWidth);
-                int b = (int) (fRect.bottom*scaleHeight);
-                Log.d(TAG,"[T"+i+"]:[left:"+l+",top:"+t+",right:"+r+",bottom:"+b+"]");
-
-                //人脸检测坐标基于相机成像画面尺寸以及坐标原点。此处进行坐标转换以及原点(0,0)换算
-                //人脸检测：坐标原点为相机成像画面的左上角，left、top、bottom、right以成像画面左上下右为基准
-                //画面旋转后：原点位置不一样，根据相机成像画面的旋转角度需要换算到画布的左上角，left、top、bottom、right基准也与原先不一样，
-                //如相对预览画面相机成像画面角度为90°那么成像画面坐标的top，在预览画面就为left。如果再翻转，那成像画面的top就为预览画面的right，且坐标起点为右，需要换算到左边
-                if(mFacing == Camera.CameraInfo.CAMERA_FACING_FRONT){
-                    //此处前置摄像头成像画面相对于预览画面顺时针90°+翻转。left、top、bottom、right变为bottom、right、top、left，并且由于坐标原点由左上角变为右下角，X,Y方向都要进行坐标换算
-                    canvas.drawRect(canvas.getWidth()-b,canvas.getHeight()-r,canvas.getWidth()-t,canvas.getHeight()-l,getPaint());
-                }else{
-                    //此处后置摄像头成像画面相对于预览画面顺时针270°，left、top、bottom、right变为bottom、left、top、right，并且由于坐标原点由左上角变为左下角，Y方向需要进行坐标换算
-                    canvas.drawRect(canvas.getWidth()-b,l,canvas.getWidth()-t,r,getPaint());
-                }
-            }
-        }
-        getHolder().unlockCanvasAndPost(canvas);
-    }
-    Paint pb;
-    private Paint getPaint() {
-        if(pb == null){
-            pb =new Paint();
-            pb.setColor(Color.BLUE);
-            pb.setStrokeWidth(10);
-            pb.setStyle(Paint.Style.STROKE);//使绘制的矩形中空
-        }
-        return pb;
-    }
-
-    private int mCameraSensorOrientation = 0;
+    /********测试代码********/
     private Matrix mFaceDetectMatrix = new Matrix();
-    ArrayList<RectF> mFacesRect = new ArrayList<RectF>();
 
     private ArrayList<RectF> transForm2(Face[] faces) {
-        mFacesRect.clear();
-        for (Face face : faces) {
-            Rect bounds = face.getBounds();
-            int left = bounds.left;
-            int top = bounds.top;
-            int right = bounds.right;
-            int bottom = bounds.bottom;
-
-            RectF rawFaceRect = new RectF((float) left, (float) top, (float) right, (float) bottom);
-            mFaceDetectMatrix.mapRect(rawFaceRect);
-            mFaceDetectMatrix.setRotate(mCameraSensorOrientation);
-            boolean mirror = (mFacing == Camera.CameraInfo.CAMERA_FACING_FRONT);
-            float scaledWidth = mPreview.getWidth() / cRect.width();
-            float scaledHeight = mPreview.getHeight() / cRect.height();
-            mFaceDetectMatrix.setScale(mirror ? -scaledWidth : scaledWidth, scaledHeight);
-            RectF resultFaceRect;
-            if (mFacing == CaptureRequest.LENS_FACING_FRONT) {
-                resultFaceRect = rawFaceRect;
-            } else {
-                resultFaceRect = new RectF(rawFaceRect.left, rawFaceRect.top - mPreview.getWidth(),
-                        rawFaceRect.right, rawFaceRect.bottom - mPreview.getWidth());
-            }
-            mFacesRect.add(resultFaceRect);
+        if(faces ==null || faces.length ==0){
+            return  null;
         }
-        return mFacesRect;
+        int mCameraSensorOrientation = mCameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+        mFaceDetectMatrix.setRotate((float) mCameraSensorOrientation);
+        boolean mirror = (mFacing == Camera.CameraInfo.CAMERA_FACING_FRONT);
+        //获取成像区域
+        Rect activeArraySizeRect = mCameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+        Size previewSize = chooseOptimalSize();
+        float scaledWidth = previewSize.getWidth() / (float)activeArraySizeRect.width();
+        float scaledHeight = previewSize.getHeight() /(float) activeArraySizeRect.height();
+        mFaceDetectMatrix.postScale(mirror ? -scaledWidth : scaledWidth, scaledHeight);
+        if (exchangeWidthAndHeight(mDisplayOrientation, mCameraSensorOrientation)) {
+            mFaceDetectMatrix.postTranslate(previewSize.getHeight(), previewSize.getWidth());
+        }
+
+        ArrayList<RectF> rectList = new ArrayList<RectF>();
+        for (Face e : faces) {
+            RectF srcRect = new RectF(e.getBounds());
+            RectF dstRect = new RectF(0f, 0f, 0f, 0f);
+            mFaceDetectMatrix.mapRect(dstRect, srcRect);
+            rectList.add(dstRect);
+        }
+        return rectList;
+
     }
 
-
-
-    public SurfaceHolder getHolder() {
-        return mPreview.getSurfaceHolder();
-    }
-
-    private Canvas mCanvas;
     /**
-     * 在SurfaceView上画人脸框图
+     * 根据提供的屏幕方向 [displayRotation] 和相机方向 [sensorOrientation] 返回是否需要交换宽高
      */
-    public int[] drawRectangle(int left, int top, int right, int bottom) {
-
-        //定义画笔
-        Paint mpaint = new Paint();
-        mpaint.setColor(Color.BLUE);
-        // mpaint.setAntiAlias(true);//去锯齿
-        mpaint.setStyle(Paint.Style.STROKE);//空心
-        // 设置paint的外框宽度
-        mpaint.setStrokeWidth(2f);
-        mCanvas = new Canvas();
-        mCanvas = getHolder().lockCanvas();
-        mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR); //清楚掉上一次的画框。
-
-        // 由于成像画面和预览画面存在缩放旋转关系 所以需要调整
-        //成像画面与方框绘制画布长宽比比例（同画面角度情况下的长宽比例（此处前后摄像头成像画面相对预览画面倒置（±90°），计算比例时长宽互换））
-        float scaleWidth = mCanvas.getHeight() * 1.0f / cPixelSize.getWidth();
-        float scaleHeight = mCanvas.getWidth() * 1.0f / cPixelSize.getHeight();
-        //坐标缩放
-        int l = (int) (left * scaleWidth);
-        int t = (int) (top * scaleHeight);
-        int r = (int) (right * scaleWidth);
-        int b = (int) (bottom * scaleHeight);
-
-//        // left、top、bottom、right变为bottom、right、top、left，并且由于坐标原点由左上角变为右下角，X,Y方向都要进行坐标换算
-//        // 逆时针旋转了270°
-//        left = mCanvas.getWidth() - b - 180 + 20; // -180
-//        top = getView().getHeight() - r - 180 + 20;  // -180
-//        right = mCanvas.getWidth() - t - 90 + 20;  // -90
-//        bottom = getView().getHeight() - l + 20 + 20;  // +20
-//        // 开始画框
-//        Rect draw_r = new Rect(left, top, right, bottom);
-//        mCanvas.drawRect(draw_r, mpaint);
-        if(mFacing == Camera.CameraInfo.CAMERA_FACING_FRONT){
-            //此处前置摄像头成像画面相对于预览画面顺时针90°+翻转。left、top、bottom、right变为bottom、right、top、left，并且由于坐标原点由左上角变为右下角，X,Y方向都要进行坐标换算
-            mCanvas.drawRect(mCanvas.getWidth()-b,mCanvas.getHeight()-r,mCanvas.getWidth()-t,mCanvas.getHeight()-l,mpaint);
-        }else{
-            //此处后置摄像头成像画面相对于预览画面顺时针270°，left、top、bottom、right变为bottom、left、top、right，并且由于坐标原点由左上角变为左下角，Y方向需要进行坐标换算
-            mCanvas.drawRect(mCanvas.getWidth()-b,l,mCanvas.getWidth()-t,r,mpaint);
+    private boolean exchangeWidthAndHeight(int displayRotation, int sensorOrientation) {
+        boolean exchange = false;
+        switch (displayRotation) {
+            case Surface.ROTATION_0:
+            case Surface.ROTATION_180:
+                if (sensorOrientation == 90 || sensorOrientation == 270) {
+                    exchange = true;
+                }
+                break;
+            case Surface.ROTATION_90:
+            case Surface.ROTATION_270:
+                if (sensorOrientation == 0 || sensorOrientation == 180) {
+                    exchange = true;
+                }
+                break;
         }
-
-        getHolder().unlockCanvasAndPost(mCanvas);
-        int[] rec_coordinate = {left, top, right, bottom};
-        return rec_coordinate;
+        return exchange;
     }
 
 
@@ -595,7 +483,7 @@ class Camera2 extends CameraViewImpl {
     private static android.util.Size cPixelSize;                        // 保存成像尺寸
 
     private void setupFace() {
-        if(mCameraCharacteristics == null ){
+        if (mCameraCharacteristics == null) {
             return;
         }
         cRect = mCameraCharacteristics.get(
@@ -850,7 +738,6 @@ class Camera2 extends CameraViewImpl {
             @SuppressWarnings("ConstantConditions")
             int sensorOrientation = mCameraCharacteristics.get(
                     CameraCharacteristics.SENSOR_ORIENTATION);
-            mCameraSensorOrientation = sensorOrientation;
             captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION,
                     (sensorOrientation +
                             mDisplayOrientation * (mFacing == Constants.FACING_FRONT ? 1 : -1) +
@@ -861,8 +748,8 @@ class Camera2 extends CameraViewImpl {
                     new CameraCaptureSession.CaptureCallback() {
                         @Override
                         public void onCaptureCompleted(@NonNull CameraCaptureSession session,
-                                @NonNull CaptureRequest request,
-                                @NonNull TotalCaptureResult result) {
+                                                       @NonNull CaptureRequest request,
+                                                       @NonNull TotalCaptureResult result) {
                             unlockFocus();
                         }
                     }, null);
@@ -983,5 +870,6 @@ class Camera2 extends CameraViewImpl {
         public abstract void onPreview(CaptureResult result);
 
     }
+
 
 }

@@ -21,4 +21,11 @@ class Camerademo {
     String result = await _channel.invokeMethod("jumpWithParams",map);
     return result;
   }
+  factory Camerademo() => const Camerademo._internal_();
+  const Camerademo._internal_();
+}
+class test{
+  test(){
+    new Camerademo();
+  }
 }
